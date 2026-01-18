@@ -1,6 +1,7 @@
 local process = require("@lune/process")
 local fs = require("@lune/fs")
-local brainfuck = require("../brainfuck")
+local luau = require("@lune/luau")
+local translator = require("../translator")
 
 local FILE_PATH = process.args[1]
 if not FILE_PATH then
@@ -8,5 +9,6 @@ if not FILE_PATH then
 end
 
 local file = fs.readFile(FILE_PATH)
-local bytecode = brainfuck.compile(file)
-brainfuck.load(bytecode)
+local code = translator.translate(file)
+local bytecode = luau.compile(code, { optimizationLevel = 2 })
+luau.load(bytecode, { codegenEnabled = true })()
